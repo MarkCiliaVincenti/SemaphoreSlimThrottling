@@ -10,7 +10,9 @@ The recommended means is to use [NuGet](https://www.nuget.org/packages/Semaphore
 
 ## Usage
 ```csharp
-var mySemaphore = new SemaphoreSlimThrottle(-1, 10); // there are 11 concurrent requests, and we want to start limiting to 10. SemaphoreSlim does not allow negative initialCount.
+// there are 11 concurrent requests, and we want to start limiting to 10.
+// SemaphoreSlim does not allow negative initialCount.
+var mySemaphore = new SemaphoreSlimThrottle(-1, 10);
 ```
 
 For more information, read the documentation for [SemaphoreSlim](https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim).
