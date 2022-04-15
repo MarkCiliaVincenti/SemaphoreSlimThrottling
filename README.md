@@ -1,0 +1,9 @@
+# ![SemaphoreSlimThrottling](https://raw.githubusercontent.com/MarkCiliaVincenti/SemaphoreSlimThrottling/master/logo32.png) SemaphoreSlimThrottling
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MarkCiliaVincenti/SemaphoreSlimThrottling/.NET?logo=github&style=for-the-badge)](https://actions-badge.atrox.dev/MarkCiliaVincenti/SemaphoreSlimThrottling/goto?ref=master) [![Nuget](https://img.shields.io/nuget/v/SemaphoreSlimThrottling?label=SemaphoreSlimThrottling&logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/SemaphoreSlimThrottling) [![Nuget](https://img.shields.io/nuget/dt/SemaphoreSlimThrottling?logo=nuget&style=for-the-badge)](https://www.nuget.org/packages/SemaphoreSlimThrottling)
+
+An asynchronous .NET Standard 2.0 library that provides a class derived from SemaphoreSlim allowing for a negative `initialCount`. This could be used, for example, when starting to throttle requests but initially already have more concurrent requests than the maximum you want to start allowing.
+
+Supports .NET Framework 4.6.1 or later, .NET Core 2.0 or later, and .NET 5.0 or later.
+
+## Installation
+The recommended means is to use [NuGet](https://www.nuget.org/packages/SemaphoreSlimThrottling), but you could also download the source code from [here](https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling/releases).

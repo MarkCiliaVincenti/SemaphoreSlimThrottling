@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32407.343
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemaphoreSlimThrottling", "SemaphoreSlimThrottling\SemaphoreSlimThrottling.csproj", "{DE137767-C47A-4F81-9D93-5A5BEEC4D410}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SemaphoreSlimThrottling.Tests", "SemaphoreSlimThrottling.Tests\SemaphoreSlimThrottling.Tests.csproj", "{DE5D0A14-072A-47B0-BD95-5963B68DD4E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE137767-C47A-4F81-9D93-5A5BEEC4D410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE137767-C47A-4F81-9D93-5A5BEEC4D410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE137767-C47A-4F81-9D93-5A5BEEC4D410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE137767-C47A-4F81-9D93-5A5BEEC4D410}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE5D0A14-072A-47B0-BD95-5963B68DD4E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE5D0A14-072A-47B0-BD95-5963B68DD4E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE5D0A14-072A-47B0-BD95-5963B68DD4E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE5D0A14-072A-47B0-BD95-5963B68DD4E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {267A3428-3DCB-4406-9987-956CED734360}
+	EndGlobalSection
+EndGlobal
