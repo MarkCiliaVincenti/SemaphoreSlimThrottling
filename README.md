@@ -7,3 +7,10 @@ Supports .NET Framework 4.6.1 or later, .NET Core 2.0 or later, and .NET 5.0 or 
 
 ## Installation
 The recommended means is to use [NuGet](https://www.nuget.org/packages/SemaphoreSlimThrottling), but you could also download the source code from [here](https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling/releases).
+
+## Usage
+```csharp
+var mySemaphore = new SemaphoreSlimThrottle(-1, 10); // there are 11 concurrent requests, and we want to start limiting to 10. SemaphoreSlim does not allow negative initialCount.
+```
+
+For more information, read the documentation for [SemaphoreSlim](https://docs.microsoft.com/en-us/dotnet/api/system.threading.semaphoreslim).
