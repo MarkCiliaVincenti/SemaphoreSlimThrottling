@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace SemaphoreSlimThrottling
 {
@@ -11,10 +12,12 @@ namespace SemaphoreSlimThrottling
     /// </summary>
     [ComVisible(false)]
     [DebuggerDisplay("Current Count = {CurrentCount}")]
-    public class SemaphoreSlimThrottle : SemaphoreSlim
+    public class SemaphoreSlimThrottle : IDisposable
     {
         private volatile int _throttleCount;
         private readonly object _lock = new object();
+        private bool _throttleEnabled = false;
+        private readonly SemaphoreSlim _semaphoreSlim;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SemaphoreSlimThrottle"/> class, specifying the initial number of requests that can be granted concurrently.
@@ -22,8 +25,8 @@ namespace SemaphoreSlimThrottling
         /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         public SemaphoreSlimThrottle(int initialCount)
-            : base(initialCount)
         {
+            _semaphoreSlim = new SemaphoreSlim(initialCount);
         }
 
         /// <summary>
@@ -33,9 +36,17 @@ namespace SemaphoreSlimThrottling
         /// <param name="maxCount">The maximum number of requests for the semaphore that can be granted concurrently.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         public SemaphoreSlimThrottle(int initialCount, int maxCount)
-            : base(Math.Max(0, initialCount), maxCount)
         {
-            _throttleCount = Math.Min(0, initialCount);
+            if (initialCount < 0)
+            {
+                _throttleCount = initialCount;
+                _throttleEnabled = true;
+                _semaphoreSlim = new SemaphoreSlim(0, maxCount);
+            }
+            else
+            {
+                _semaphoreSlim = new SemaphoreSlim(initialCount, maxCount);
+            }
         }
 
         /// <summary>
@@ -44,7 +55,7 @@ namespace SemaphoreSlimThrottling
         /// <returns>
         /// The number of remaining threads that can enter the semaphore.
         /// </returns>
-        public new int CurrentCount => _throttleCount + base.CurrentCount;
+        public int CurrentCount => (!_throttleEnabled) ? _semaphoreSlim.CurrentCount : _throttleCount + _semaphoreSlim.CurrentCount;
 
         /// <summary>
         /// Releases the <see cref="SemaphoreSlimThrottle"/> object once.
@@ -52,21 +63,7 @@ namespace SemaphoreSlimThrottling
         /// <returns>The previous count of the <see cref="SemaphoreSlimThrottle"/>.</returns>
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="SemaphoreFullException"/>
-        public new int Release()
-        {
-            if (_throttleCount < 0)
-            {
-                lock (_lock)
-                {
-                    if (_throttleCount < 0)
-                    {
-                        _throttleCount++;
-                        return _throttleCount - 1;
-                    }
-                }
-            }
-            return base.Release();
-        }
+        public int Release() => Release(1);
 
         /// <summary>
         /// Releases the <see cref="SemaphoreSlimThrottle"/> object a specified number of times.
@@ -75,40 +72,172 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="SemaphoreFullException"/>
-        public new int Release(int releaseCount)
+        public int Release(int releaseCount)
         {
-            if (releaseCount < 1)
+            // using bool property to avoid unnecessary volatile accesses in happy path
+            if (releaseCount < 1 || !_throttleEnabled)
             {
-                base.Release(releaseCount); // throws exception
+                return _semaphoreSlim.Release(releaseCount);
             }
 
-            if (releaseCount + _throttleCount <= 0)
+            int remainingCount;
+            int returnCount = 0;
+            lock (_lock)
             {
-                lock (_lock)
+                var throttleCount = _throttleCount;
+                if (throttleCount == 0 || !_throttleEnabled) // Different thread released them all
                 {
-                    if (releaseCount + _throttleCount <= 0)
-                    {
-                        _throttleCount += releaseCount;
-                        return _throttleCount - releaseCount;
-                    }
+                    remainingCount = releaseCount;
+                }
+                else if (releaseCount + throttleCount < 0) // Releasing less than throttle; just decrease
+                {
+                    _throttleCount += releaseCount;
+                    return throttleCount;
+                }
+                else // releasing all the throttles
+                {
+                    _throttleCount = 0;
+                    _throttleEnabled = false;
+                    returnCount = throttleCount;
+                    remainingCount = releaseCount + throttleCount;
                 }
             }
 
-            if (_throttleCount < 0)
+            // doing outside lock
+            if (remainingCount > 0) // call into base if more locks to be released
             {
-                lock (_lock)
-                {
-                    if (_throttleCount < 0)
-                    {
-                        int output = CurrentCount;
-                        base.Release(releaseCount + _throttleCount);
-                        _throttleCount = 0;
-                        return output;
-                    }
-                }
+                return _semaphoreSlim.Release(remainingCount) + returnCount;
             }
 
-            return base.Release(releaseCount);
+            return returnCount + _semaphoreSlim.CurrentCount;
         }
+
+        /// <summary>
+        /// Releases all resources used by the current instance of the <see cref="SemaphoreSlimThrottle"/> class.
+        /// </summary>
+        public void Dispose()
+        {
+            _semaphoreSlim.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
+        #region direct
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.AvailableWaitHandle"/>
+        /// </summary>
+        /// <returns>
+        /// <inheritdoc cref="SemaphoreSlim.AvailableWaitHandle"/>
+        /// </returns>
+        /// <exception cref="ObjectDisposedException"/>
+        public WaitHandle AvailableWaitHandle => _semaphoreSlim.AvailableWaitHandle;
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait"/>
+        /// </summary>
+        /// <exception cref="ObjectDisposedException"/>
+        public void Wait() => _semaphoreSlim.Wait();
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait(int)"/>
+        /// </summary>
+        /// <param name="millisecondsTimeout"><inheritdoc cref="SemaphoreSlim.Wait(int)"/></param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.Wait(int)"/></returns>
+        public bool Wait(int millisecondsTimeout) => _semaphoreSlim.Wait(millisecondsTimeout);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait(int, CancellationToken)"/>
+        /// </summary>
+        /// <param name="millisecondsTimeout"><inheritdoc cref="SemaphoreSlim.Wait(int, CancellationToken)" path="/param[@name='millisecondsTimeout']"/></param>
+        /// <param name="cancellationToken"><inheritdoc cref="SemaphoreSlim.Wait(int, CancellationToken)" path="/param[@name='cancellationToken']"/></param>
+        /// <exception cref="OperationCanceledException"/>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.Wait(int, CancellationToken)"/></returns>
+        public bool Wait(int millisecondsTimeout, CancellationToken cancellationToken) => _semaphoreSlim.Wait(millisecondsTimeout, cancellationToken);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait(TimeSpan)"/>
+        /// </summary>
+        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.Wait(TimeSpan)"/></param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.Wait(TimeSpan)"/></returns>
+        public bool Wait(TimeSpan timeout) => _semaphoreSlim.Wait(timeout);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait(TimeSpan, CancellationToken)"/>
+        /// </summary>
+        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.Wait(TimeSpan, CancellationToken)" path="/param[@name='timeout']"/></param>
+        /// <param name="cancellationToken"><inheritdoc cref="SemaphoreSlim.Wait(int, CancellationToken)" path="/param[@name='cancellationToken']"/></param>
+        /// <exception cref="OperationCanceledException"/>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.Wait(TimeSpan, CancellationToken)"/></returns>
+        public bool Wait(TimeSpan timeout, CancellationToken cancellationToken) => _semaphoreSlim.Wait(timeout, cancellationToken);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/>
+        /// </summary>
+        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></param>
+        /// <exception cref="OperationCanceledException"/>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></returns>
+        public void Wait(CancellationToken cancellationToken) => _semaphoreSlim.Wait(cancellationToken);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.WaitAsync"/>
+        /// </summary>
+        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync"/></returns>
+        public Task WaitAsync() => _semaphoreSlim.WaitAsync();
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.WaitAsync(int)"/>
+        /// </summary>
+        /// <param name="millisecondsTimeout"><inheritdoc cref="SemaphoreSlim.WaitAsync(int)"/></param>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(int)"/></returns>
+        public Task<bool> WaitAsync(int millisecondsTimeout) => _semaphoreSlim.WaitAsync(millisecondsTimeout);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.WaitAsync(int, CancellationToken)"/>
+        /// </summary>
+        /// <param name="millisecondsTimeout"><inheritdoc cref="SemaphoreSlim.WaitAsync(int, CancellationToken)" path="/param[@name='millisecondsTimeout']"/></param>
+        /// <param name="cancellationToken"><inheritdoc cref="SemaphoreSlim.WaitAsync(int, CancellationToken)" path="/param[@name='cancellationToken']"/></param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="OperationCanceledException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(int, CancellationToken)"/></returns>        
+        public Task<bool> WaitAsync(int millisecondsTimeout, CancellationToken cancellationToken) => _semaphoreSlim.WaitAsync(millisecondsTimeout, cancellationToken);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/>
+        /// </summary>
+        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></param>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="OperationCanceledException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></returns>
+        public Task WaitAsync(CancellationToken cancellationToken) => _semaphoreSlim.WaitAsync(cancellationToken);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan)"/>
+        /// </summary>
+        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan)"/></param>
+        /// <exception cref="ObjectDisposedException"/>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan)"/></returns>
+        public Task<bool> WaitAsync(TimeSpan timeout) => _semaphoreSlim.WaitAsync(timeout);
+
+        /// <summary>
+        /// <inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan, CancellationToken)"/>
+        /// </summary>
+        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan, CancellationToken)" path="/param[@name='timeout']"/></param>
+        /// <param name="cancellationToken"><inheritdoc cref="SemaphoreSlim.WaitAsync(int, CancellationToken)" path="/param[@name='cancellationToken']"/></param>
+        /// <exception cref="ArgumentOutOfRangeException"/>
+        /// <exception cref="OperationCanceledException"/>
+        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan, CancellationToken)"/></returns>
+        public Task<bool> WaitAsync(TimeSpan timeout, CancellationToken cancellationToken) => _semaphoreSlim.WaitAsync(timeout, cancellationToken);
+        #endregion direct
     }
 }
