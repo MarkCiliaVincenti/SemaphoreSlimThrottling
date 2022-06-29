@@ -132,7 +132,7 @@ namespace SemaphoreSlimThrottling
         public WaitHandle AvailableWaitHandle => _semaphoreSlim.AvailableWaitHandle;
 
         /// <summary>
-        /// <inheritdoc cref="SemaphoreSlim.Wait"/>
+        /// <inheritdoc cref="SemaphoreSlim.Wait()"/>
         /// </summary>
         /// <exception cref="ObjectDisposedException"/>
         public void Wait() => _semaphoreSlim.Wait();
@@ -179,16 +179,16 @@ namespace SemaphoreSlimThrottling
         /// <summary>
         /// <inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/>
         /// </summary>
-        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></param>
+        /// <param name="cancellationToken"><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></param>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="ObjectDisposedException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></returns>
         public void Wait(CancellationToken cancellationToken) => _semaphoreSlim.Wait(cancellationToken);
 
         /// <summary>
-        /// <inheritdoc cref="SemaphoreSlim.WaitAsync"/>
+        /// <inheritdoc cref="SemaphoreSlim.WaitAsync()"/>
         /// </summary>
-        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync"/></returns>
+        /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync()"/></returns>
         public Task WaitAsync() => _semaphoreSlim.WaitAsync();
 
         /// <summary>
@@ -214,7 +214,7 @@ namespace SemaphoreSlimThrottling
         /// <summary>
         /// <inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/>
         /// </summary>
-        /// <param name="timeout"><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></param>
+        /// <param name="cancellationToken"><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></param>
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></returns>
