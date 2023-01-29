@@ -7,16 +7,16 @@
 		<PackageProjectUrl>https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling</PackageProjectUrl>
 		<Copyright>MIT</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.0.7</Version>
+		<Version>1.0.9</Version>
 		<PackageIcon>logo.png</PackageIcon>
-		<PackageReleaseNotes>Updated licensing, fixed README shields issue.</PackageReleaseNotes>
+		<PackageReleaseNotes>Enabled deterministic builds, allowing debugging of this library from your code.</PackageReleaseNotes>
 		<Description>A .NET Standard 2.0 library that provides a class that uses SemaphoreSlim but allows a negative initialCount. This could be used, for example, when starting to throttle requests but initially already have more concurrent requests than the maximum you want to start allowing.</Description>
-		<Copyright>© 2022 Mark Cilia Vincenti</Copyright>
+		<Copyright>© 2023 Mark Cilia Vincenti</Copyright>
 		<PackageTags>Semaphore,SemaphoreSlim,throttling,throttle,.NET Standard,netstandard</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<AssemblyVersion>1.0.7.0</AssemblyVersion>
-		<FileVersion>1.0.7.0</FileVersion>
+		<AssemblyVersion>1.0.9.0</AssemblyVersion>
+		<FileVersion>1.0.9.0</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<IsPackable>true</IsPackable>
 		<IsTrimmable>true</IsTrimmable>
@@ -34,6 +34,10 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Optimize>true</Optimize>
 	</PropertyGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.1.1" PrivateAssets="All"/>
+	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\README.md">
