@@ -16,7 +16,7 @@ namespace SemaphoreSlimThrottling
     {
         private volatile int _throttleCount;
         private readonly object _lock = new object();
-        private bool _throttleEnabled = false;
+        private bool _throttleEnabled;
         private readonly SemaphoreSlim _semaphoreSlim;
 
         /// <summary>
