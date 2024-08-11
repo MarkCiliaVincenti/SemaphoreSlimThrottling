@@ -15,7 +15,7 @@ namespace SemaphoreSlimThrottling
     public class SemaphoreSlimThrottle : IDisposable
     {
         private volatile int _throttleCount;
-        private readonly object _lock = new object();
+        private readonly Lock _lock = new Lock();
         private bool _throttleEnabled;
         private readonly SemaphoreSlim _semaphoreSlim;
 
