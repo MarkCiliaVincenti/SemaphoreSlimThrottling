@@ -1,23 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net9.0</TargetFrameworks>
-		<LangVersion>Preview</LangVersion>
+		<TargetFrameworks>netstandard2.0;net6.0;net7.0;net9.0</TargetFrameworks>
 		<Authors>Mark Cilia Vincenti</Authors>
 		<RepositoryUrl>https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling.git</RepositoryUrl>
 		<PackageProjectUrl>https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling</PackageProjectUrl>
 		<Copyright>MIT</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.0.14</Version>
+		<Version>1.1.0</Version>
 		<PackageIcon>logo.png</PackageIcon>
-		<PackageReleaseNotes>Dependency update</PackageReleaseNotes>
+		<PackageReleaseNotes>Deterministic builds, AOT and trimming.</PackageReleaseNotes>
 		<Description>A .NET Standard 2.0 library that provides a class that uses SemaphoreSlim but allows a negative initialCount. This could be used, for example, when starting to throttle requests but initially already have more concurrent requests than the maximum you want to start allowing.</Description>
 		<Copyright>© 2024 Mark Cilia Vincenti</Copyright>
 		<PackageTags>Semaphore,SemaphoreSlim,throttling,throttle,.NET Standard,netstandard</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<AssemblyVersion>1.0.14.0</AssemblyVersion>
-		<FileVersion>1.0.14.0</FileVersion>
+		<AssemblyVersion>1.1.0.0</AssemblyVersion>
+		<FileVersion>1.1.0.0</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<IsPackable>true</IsPackable>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
@@ -25,7 +24,18 @@
 		<AnalysisLevel>latest</AnalysisLevel>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>SemaphoreSlimThrottling.snk</AssemblyOriginatorKeyFile>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="$(DefineConstants.Contains(AOT_COMPATIBLE))">
+		<IsAotCompatible>true</IsAotCompatible>
+		<PublishAot>true</PublishAot>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(DefineConstants.Contains(TRIMMING_COMPATIBLE))">
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimmerDefaultAction>link</TrimmerDefaultAction>
+	</PropertyGroup>	
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -33,11 +43,11 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="DotNet.ReproducibleBuilds" Version="1.2.4" PrivateAssets="All" />
+		<PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
 	</ItemGroup>
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-		<PackageReference Include="Backport.System.Threading.Lock" Version="1.1.5" />
+	<ItemGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))">
+		<PackageReference Include="Backport.System.Threading.Lock" />
 	</ItemGroup>
 
 	<ItemGroup>
