@@ -26,7 +26,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ArgumentOutOfRangeException"/>
         public SemaphoreSlimThrottle(int initialCount)
         {
-            _semaphoreSlim = new SemaphoreSlim(initialCount);
+            _semaphoreSlim = new(initialCount);
         }
 
         /// <summary>
