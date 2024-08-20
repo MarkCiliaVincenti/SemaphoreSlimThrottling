@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace SemaphoreSlimThrottling
         /// </summary>
         /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SemaphoreSlimThrottle(int initialCount)
         {
             _semaphoreSlim = new(initialCount);
@@ -35,6 +37,7 @@ namespace SemaphoreSlimThrottling
         /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently. Accepts negative numbers unlike <see cref="SemaphoreSlim"/>.</param>
         /// <param name="maxCount">The maximum number of requests for the semaphore that can be granted concurrently.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public SemaphoreSlimThrottle(int initialCount, int maxCount)
         {
             if (initialCount < 0)
@@ -63,6 +66,7 @@ namespace SemaphoreSlimThrottling
         /// <returns>The previous count of the <see cref="SemaphoreSlimThrottle"/>.</returns>
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="SemaphoreFullException"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Release() => Release(1);
 
         /// <summary>
@@ -72,6 +76,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="SemaphoreFullException"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Release(int releaseCount)
         {
             // using bool property to avoid unnecessary volatile accesses in happy path
@@ -115,6 +120,7 @@ namespace SemaphoreSlimThrottling
         /// <summary>
         /// Releases all resources used by the current instance of the <see cref="SemaphoreSlimThrottle"/> class.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Dispose()
         {
             _semaphoreSlim.Dispose();
@@ -135,6 +141,7 @@ namespace SemaphoreSlimThrottling
         /// <inheritdoc cref="SemaphoreSlim.Wait()"/>
         /// </summary>
         /// <exception cref="ObjectDisposedException"/>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Wait() => _semaphoreSlim.Wait();
 
         /// <summary>
@@ -143,6 +150,7 @@ namespace SemaphoreSlimThrottling
         /// <param name="millisecondsTimeout"><inheritdoc cref="SemaphoreSlim.Wait(int)"/></param>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(int)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Wait(int millisecondsTimeout) => _semaphoreSlim.Wait(millisecondsTimeout);
 
         /// <summary>
@@ -154,6 +162,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="ObjectDisposedException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(int, CancellationToken)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Wait(int millisecondsTimeout, CancellationToken cancellationToken) => _semaphoreSlim.Wait(millisecondsTimeout, cancellationToken);
 
         /// <summary>
@@ -163,6 +172,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="ObjectDisposedException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(TimeSpan)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Wait(TimeSpan timeout) => _semaphoreSlim.Wait(timeout);
 
         /// <summary>
@@ -174,6 +184,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="ObjectDisposedException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(TimeSpan, CancellationToken)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Wait(TimeSpan timeout, CancellationToken cancellationToken) => _semaphoreSlim.Wait(timeout, cancellationToken);
 
         /// <summary>
@@ -183,12 +194,14 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="ObjectDisposedException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Wait(CancellationToken cancellationToken) => _semaphoreSlim.Wait(cancellationToken);
 
         /// <summary>
         /// <inheritdoc cref="SemaphoreSlim.WaitAsync()"/>
         /// </summary>
         /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync()"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task WaitAsync() => _semaphoreSlim.WaitAsync();
 
         /// <summary>
@@ -198,6 +211,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(int)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<bool> WaitAsync(int millisecondsTimeout) => _semaphoreSlim.WaitAsync(millisecondsTimeout);
 
         /// <summary>
@@ -209,6 +223,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(int, CancellationToken)"/></returns>        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<bool> WaitAsync(int millisecondsTimeout, CancellationToken cancellationToken) => _semaphoreSlim.WaitAsync(millisecondsTimeout, cancellationToken);
 
         /// <summary>
@@ -218,6 +233,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.Wait(CancellationToken)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task WaitAsync(CancellationToken cancellationToken) => _semaphoreSlim.WaitAsync(cancellationToken);
 
         /// <summary>
@@ -227,6 +243,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ObjectDisposedException"/>
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<bool> WaitAsync(TimeSpan timeout) => _semaphoreSlim.WaitAsync(timeout);
 
         /// <summary>
@@ -237,6 +254,7 @@ namespace SemaphoreSlimThrottling
         /// <exception cref="ArgumentOutOfRangeException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <returns><inheritdoc cref="SemaphoreSlim.WaitAsync(TimeSpan, CancellationToken)"/></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Task<bool> WaitAsync(TimeSpan timeout, CancellationToken cancellationToken) => _semaphoreSlim.WaitAsync(timeout, cancellationToken);
         #endregion direct
     }

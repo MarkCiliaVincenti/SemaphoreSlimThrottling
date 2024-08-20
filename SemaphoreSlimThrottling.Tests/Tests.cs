@@ -32,27 +32,14 @@ namespace SemaphoreSlimThrottling.Tests
         [Fact]
         public async Task TestSemaphoreSlimThrottleWithoutMaxCount()
         {
-            var semaphoreSlimThrottle = new SemaphoreSlimThrottle(-2);
-            Assert.Equal(-2, semaphoreSlimThrottle.CurrentCount);
-            Assert.Equal(-2, semaphoreSlimThrottle.Release());
-            Assert.Equal(-1, semaphoreSlimThrottle.CurrentCount);
-            Assert.Equal(-1, semaphoreSlimThrottle.Release());
+            var semaphoreSlimThrottle = new SemaphoreSlimThrottle(1);
+            Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
+            semaphoreSlimThrottle.Wait();
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
-            Assert.Equal(0, semaphoreSlimThrottle.Release());
+            semaphoreSlimThrottle.Release(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
             await semaphoreSlimThrottle.WaitAsync();
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
-            Assert.Equal(0, semaphoreSlimThrottle.Release());
-
-            semaphoreSlimThrottle = new SemaphoreSlimThrottle(-2);
-            Assert.Equal(-2, semaphoreSlimThrottle.CurrentCount);
-            Assert.Equal(-2, semaphoreSlimThrottle.Release(3));
-            Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            await semaphoreSlimThrottle.WaitAsync();
-            Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
-            Assert.Equal(0, semaphoreSlimThrottle.Release());
-
-            semaphoreSlimThrottle = new SemaphoreSlimThrottle(1);
             semaphoreSlimThrottle.Dispose();
         }
     }
