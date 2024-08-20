@@ -68,11 +68,11 @@ namespace SemaphoreSlimThrottling.Tests
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             semaphoreSlimThrottle.Release(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            semaphoreSlimThrottle.Wait();
+            semaphoreSlimThrottle.Wait(CancellationToken.None);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             semaphoreSlimThrottle.Release(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            await semaphoreSlimThrottle.WaitAsync();
+            await semaphoreSlimThrottle.WaitAsync(CancellationToken.None);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             semaphoreSlimThrottle.Dispose();
         }
