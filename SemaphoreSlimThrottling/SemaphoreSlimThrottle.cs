@@ -20,7 +20,7 @@ namespace SemaphoreSlimThrottling
         private readonly SemaphoreSlim _semaphoreSlim;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SemaphoreSlimThrottle"/> class, specifying the initial number of requests that can be granted concurrently.
+        /// Initializes a new instance of <see cref="SemaphoreSlimThrottle"/>, specifying the initial number of requests that can be granted concurrently.
         /// </summary>
         /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently.</param>
         /// <exception cref="ArgumentOutOfRangeException"/>
@@ -30,7 +30,7 @@ namespace SemaphoreSlimThrottling
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SemaphoreSlimThrottle"/> class, specifying the initial number of requests that can be granted concurrently.
+        /// Initializes a new instance of <see cref="SemaphoreSlimThrottle"/>, specifying the initial number of requests that can be granted concurrently.
         /// </summary>
         /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently. Accepts negative numbers unlike <see cref="SemaphoreSlim"/>.</param>
         /// <param name="maxCount">The maximum number of requests for the semaphore that can be granted concurrently.</param>
