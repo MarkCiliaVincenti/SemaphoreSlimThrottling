@@ -27,6 +27,9 @@ namespace SemaphoreSlimThrottling.Tests
             await semaphoreSlimThrottle.WaitAsync();
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             Assert.Equal(0, semaphoreSlimThrottle.Release());
+
+            semaphoreSlimThrottle = new SemaphoreSlimThrottle(1, 1);
+            semaphoreSlimThrottle.Dispose();
         }
 
         [Fact]
