@@ -81,6 +81,7 @@ namespace SemaphoreSlimThrottling.Tests
         public async Task ConcurrencyTest()
         {
             var semaphoreSlimThrottle = new SemaphoreSlimThrottle(-2, 100);
+            semaphoreSlimThrottle.Release(2);
             var concurrency = 50;
             var tasks = Enumerable.Range(1, concurrency)
                 .Select(async i =>
@@ -90,7 +91,7 @@ namespace SemaphoreSlimThrottling.Tests
                 });
             await Task.WhenAll(tasks.AsParallel());
 
-            Assert.Equal(52, semaphoreSlimThrottle.CurrentCount);
+            Assert.Equal(50, semaphoreSlimThrottle.CurrentCount);
         }
     }
 }
