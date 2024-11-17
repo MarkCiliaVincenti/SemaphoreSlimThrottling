@@ -7,16 +7,16 @@
 		<PackageProjectUrl>https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling</PackageProjectUrl>
 		<Copyright>MIT</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.1.4</Version>
+		<Version>1.1.5</Version>
 		<PackageIcon>logo.png</PackageIcon>
-		<PackageReleaseNotes>Dependency update.</PackageReleaseNotes>
+		<PackageReleaseNotes>Set dependency of Backport.System.Threading.Lock to work in source generator mode instead to drop DLL dependency.</PackageReleaseNotes>
 		<Description>A .NET Standard 2.0 library that provides a class that uses SemaphoreSlim but allows a negative initialCount. This could be used, for example, when starting to throttle requests but initially already have more concurrent requests than the maximum you want to start allowing.</Description>
 		<Copyright>© 2024 Mark Cilia Vincenti</Copyright>
 		<PackageTags>Semaphore,SemaphoreSlim,throttling,throttle,.NET Standard,netstandard</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<AssemblyVersion>1.1.4.0</AssemblyVersion>
-		<FileVersion>1.1.4.0</FileVersion>
+		<AssemblyVersion>1.1.5.0</AssemblyVersion>
+		<FileVersion>1.1.5.0</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<IsPackable>true</IsPackable>
 		<EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
@@ -35,16 +35,25 @@
 	<PropertyGroup Condition="$(DefineConstants.Contains(TRIMMING_COMPATIBLE))">
 		<PublishTrimmed>true</PublishTrimmed>
 		<TrimmerDefaultAction>link</TrimmerDefaultAction>
-	</PropertyGroup>	
+	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<Optimize>true</Optimize>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
-		<PackageReference Include="Backport.System.Threading.Lock" />
 		<PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Backport.System.Threading.Lock">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>analyzers</IncludeAssets>
+		</PackageReference>
+		<Using Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" Alias="Lock" Include="System.Threading.Lock" />
+		<Using Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" Alias="Lock" Include="Backport.System.Threading.Lock" />
+		<Using Alias="LockFactory" Include="Backport.System.Threading.LockFactory" />
 	</ItemGroup>
 
 	<ItemGroup>

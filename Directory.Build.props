@@ -11,9 +11,4 @@
   <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
 	<DefineConstants>AOT_COMPATIBLE</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <Using Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" Alias="Lock" Include="System.Threading.Lock" />
-    <Using Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))" Alias="Lock" Include="Backport.System.Threading.Lock" />
-    <Using Alias="LockFactory" Include="Backport.System.Threading.LockFactory" />
-  </ItemGroup>
 </Project>
