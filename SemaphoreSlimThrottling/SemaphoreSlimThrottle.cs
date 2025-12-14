@@ -25,7 +25,6 @@ public class SemaphoreSlimThrottle : IDisposable
     /// </summary>
     /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SemaphoreSlimThrottle(int initialCount)
     {
         _semaphoreSlim = new(initialCount);
@@ -58,7 +57,11 @@ public class SemaphoreSlimThrottle : IDisposable
     /// <returns>
     /// The number of remaining threads that can enter the semaphore.
     /// </returns>
-    public int CurrentCount => (!_throttleEnabled) ? _semaphoreSlim.CurrentCount : _throttleCount + _semaphoreSlim.CurrentCount;
+    public int CurrentCount
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => (!_throttleEnabled) ? _semaphoreSlim.CurrentCount : _throttleCount + _semaphoreSlim.CurrentCount;
+    }
 
     /// <summary>
     /// Releases the <see cref="SemaphoreSlimThrottle"/> object once.
@@ -76,37 +79,36 @@ public class SemaphoreSlimThrottle : IDisposable
     /// <exception cref="ObjectDisposedException"/>
     /// <exception cref="ArgumentOutOfRangeException"/>
     /// <exception cref="SemaphoreFullException"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public int Release(int releaseCount)
     {
         // using bool property to avoid unnecessary volatile accesses in happy path
-        if (releaseCount < 1 || !_throttleEnabled)
+        if (!_throttleEnabled || releaseCount < 1)
         {
             return _semaphoreSlim.Release(releaseCount);
         }
 
         int remainingCount;
         int returnCount = 0;
-        lock (_lock)
+        _lock.Enter();
+        var throttleCount = _throttleCount;
+        if (throttleCount == 0 || !_throttleEnabled) // Different thread released them all
         {
-            var throttleCount = _throttleCount;
-            if (throttleCount == 0 || !_throttleEnabled) // Different thread released them all
-            {
-                remainingCount = releaseCount;
-            }
-            else if (releaseCount + throttleCount < 0) // Releasing less than throttle; just decrease
-            {
-                _throttleCount += releaseCount;
-                return throttleCount;
-            }
-            else // releasing all the throttles
-            {
-                _throttleCount = 0;
-                _throttleEnabled = false;
-                returnCount = throttleCount;
-                remainingCount = releaseCount + throttleCount;
-            }
+            remainingCount = releaseCount;
         }
+        else if (releaseCount + throttleCount < 0) // Releasing less than throttle; just decrease
+        {
+            _throttleCount += releaseCount;
+            _lock.Exit();
+            return throttleCount;
+        }
+        else // releasing all the throttles
+        {
+            _throttleCount = 0;
+            _throttleEnabled = false;
+            returnCount = throttleCount;
+            remainingCount = releaseCount + throttleCount;
+        }
+        _lock.Exit();
 
         // doing outside lock
         if (remainingCount > 0) // call into base if more locks to be released
@@ -120,7 +122,6 @@ public class SemaphoreSlimThrottle : IDisposable
     /// <summary>
     /// Releases all resources used by the current instance of the <see cref="SemaphoreSlimThrottle"/> class.
     /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose()
     {
         _semaphoreSlim.Dispose();
@@ -135,7 +136,11 @@ public class SemaphoreSlimThrottle : IDisposable
     /// <inheritdoc cref="SemaphoreSlim.AvailableWaitHandle"/>
     /// </returns>
     /// <exception cref="ObjectDisposedException"/>
-    public WaitHandle AvailableWaitHandle => _semaphoreSlim.AvailableWaitHandle;
+    public WaitHandle AvailableWaitHandle
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _semaphoreSlim.AvailableWaitHandle;
+    }
 
     /// <summary>
     /// <inheritdoc cref="SemaphoreSlim.Wait()"/>

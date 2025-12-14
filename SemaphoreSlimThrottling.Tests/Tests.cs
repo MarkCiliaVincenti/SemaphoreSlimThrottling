@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SemaphoreSlimThrottling.Tests
@@ -92,6 +90,51 @@ namespace SemaphoreSlimThrottling.Tests
             await Task.WhenAll(tasks.AsParallel());
 
             Assert.Equal(50, semaphoreSlimThrottle.CurrentCount);
+        }
+
+        [Fact]
+        public async Task ConcurrencyTestAggressive()
+        {
+            var semaphoreSlimThrottle = new SemaphoreSlimThrottle(-98, 100);
+            var tasks = Enumerable.Range(1, 100)
+                .Select(async i =>
+                {
+                    semaphoreSlimThrottle.Release();
+                });
+            await Task.WhenAll(tasks.AsParallel());
+            var concurrency = 50;
+            tasks = Enumerable.Range(1, concurrency)
+                .Select(async i =>
+                {
+                    await semaphoreSlimThrottle.WaitAsync();
+                    semaphoreSlimThrottle.Release();
+                });
+            await Task.WhenAll(tasks.AsParallel());
+
+            Assert.Equal(2, semaphoreSlimThrottle.CurrentCount);
+        }
+
+        [Fact]
+        public async Task ConcurrencyTestNonThrottle()
+        {
+            var semaphoreSlimThrottle = new SemaphoreSlimThrottle(-3, 100);
+            var tasks = Enumerable.Range(1, 51)
+                .Select(async i =>
+                {
+                    await Task.Delay(1);
+                    semaphoreSlimThrottle.Release();
+                }).ToList().AsParallel();
+            await Task.WhenAll(tasks);
+            var concurrency = 50;
+            tasks = Enumerable.Range(1, concurrency)
+                .Select(async i =>
+                {
+                    await semaphoreSlimThrottle.WaitAsync();
+                    semaphoreSlimThrottle.Release();
+                }).ToList().AsParallel();
+            await Task.WhenAll(tasks);
+
+            Assert.Equal(48, semaphoreSlimThrottle.CurrentCount);
         }
     }
 }
