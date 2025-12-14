@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".github/workflows/dotnet.yml" />
+    <File Path="codecov.yml" />
+    <File Path="coverlet.runsettings" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Project Path="SemaphoreSlimThrottling.Tests/SemaphoreSlimThrottling.Tests.csproj" />
+  <Project Path="SemaphoreSlimThrottling/SemaphoreSlimThrottling.csproj" />
+</Solution>
