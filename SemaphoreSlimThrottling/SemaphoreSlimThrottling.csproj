@@ -7,16 +7,16 @@
 		<PackageProjectUrl>https://github.com/MarkCiliaVincenti/SemaphoreSlimThrottling</PackageProjectUrl>
 		<Copyright>MIT</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Version>1.2.0</Version>
+		<Version>1.2.1</Version>
 		<PackageIcon>logo.png</PackageIcon>
-		<PackageReleaseNotes>Minor performance optimizations.</PackageReleaseNotes>
+		<PackageReleaseNotes>Minor performance optimization.</PackageReleaseNotes>
 		<Description>A .NET library that provides a class that uses SemaphoreSlim but allows a negative initialCount. This could be used, for example, when starting to throttle requests but initially already have more concurrent requests than the maximum you want to start allowing.</Description>
 		<Copyright>© 2025 Mark Cilia Vincenti</Copyright>
 		<PackageTags>Semaphore,SemaphoreSlim,throttling,throttle,.NET Standard,netstandard</PackageTags>
 		<RepositoryType>git</RepositoryType>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<AssemblyVersion>1.2.0.0</AssemblyVersion>
-		<FileVersion>1.2.0.0</FileVersion>
+		<AssemblyVersion>1.2.1.0</AssemblyVersion>
+		<FileVersion>1.2.1.0</FileVersion>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<Nullable>enable</Nullable>
 		<IsPackable>true</IsPackable>

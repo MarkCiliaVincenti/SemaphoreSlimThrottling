@@ -36,7 +36,6 @@ public class SemaphoreSlimThrottle : IDisposable
     /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently. Accepts negative numbers unlike <see cref="SemaphoreSlim"/>.</param>
     /// <param name="maxCount">The maximum number of requests for the semaphore that can be granted concurrently.</param>
     /// <exception cref="ArgumentOutOfRangeException"/>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public SemaphoreSlimThrottle(int initialCount, int maxCount)
     {
         if (initialCount < 0)
