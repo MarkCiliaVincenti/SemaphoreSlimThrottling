@@ -5,6 +5,8 @@
     <File Path="coverlet.runsettings" />
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
   </Folder>
   <Project Path="SemaphoreSlimThrottling.Tests/SemaphoreSlimThrottling.Tests.csproj" />
   <Project Path="SemaphoreSlimThrottling/SemaphoreSlimThrottling.csproj" />
