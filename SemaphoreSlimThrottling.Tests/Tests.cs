@@ -15,10 +15,10 @@ namespace SemaphoreSlimThrottling.Tests
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             Assert.Equal(0, semaphoreSlimThrottle.Release());
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            await semaphoreSlimThrottle.WaitAsync(Timeout.Infinite);
+            await semaphoreSlimThrottle.WaitAsync(Timeout.Infinite, TestContext.Current.CancellationToken);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             Assert.Equal(0, semaphoreSlimThrottle.Release());
-            await semaphoreSlimThrottle.WaitAsync(TimeSpan.Zero);
+            await semaphoreSlimThrottle.WaitAsync(TimeSpan.Zero, TestContext.Current.CancellationToken);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             Assert.Equal(0, semaphoreSlimThrottle.Release());
             await semaphoreSlimThrottle.WaitAsync(Timeout.Infinite, CancellationToken.None);
@@ -32,7 +32,7 @@ namespace SemaphoreSlimThrottling.Tests
             Assert.Equal(-2, semaphoreSlimThrottle.CurrentCount);
             Assert.Equal(-2, semaphoreSlimThrottle.Release(3));
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            await semaphoreSlimThrottle.WaitAsync();
+            await semaphoreSlimThrottle.WaitAsync(TestContext.Current.CancellationToken);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             Assert.Equal(0, semaphoreSlimThrottle.Release());
 
@@ -46,15 +46,15 @@ namespace SemaphoreSlimThrottling.Tests
         {
             var semaphoreSlimThrottle = new SemaphoreSlimThrottle(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            semaphoreSlimThrottle.Wait();
+            semaphoreSlimThrottle.Wait(TestContext.Current.CancellationToken);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             semaphoreSlimThrottle.Release(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            semaphoreSlimThrottle.Wait(Timeout.Infinite);
+            semaphoreSlimThrottle.Wait(Timeout.Infinite, TestContext.Current.CancellationToken);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             semaphoreSlimThrottle.Release(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
-            semaphoreSlimThrottle.Wait(TimeSpan.Zero);
+            semaphoreSlimThrottle.Wait(TimeSpan.Zero, TestContext.Current.CancellationToken);
             Assert.Equal(0, semaphoreSlimThrottle.CurrentCount);
             semaphoreSlimThrottle.Release(1);
             Assert.Equal(1, semaphoreSlimThrottle.CurrentCount);
