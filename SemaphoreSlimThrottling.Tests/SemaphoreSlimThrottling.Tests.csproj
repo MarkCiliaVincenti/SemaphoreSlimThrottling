@@ -7,6 +7,7 @@
 		<IsPackable>false</IsPackable>
 		<IsTestProject>true</IsTestProject>
 		<AssemblyOriginatorKeyFile>SemaphoreSlimThrottling.snk</AssemblyOriginatorKeyFile>
+		<NoWarn>xUnit1051</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
