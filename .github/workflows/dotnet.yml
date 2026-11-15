@@ -45,4 +45,7 @@ jobs:
       uses: codecov/codecov-action@v5
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        directory: coverage
+        directory: ${{ github.workspace }}\coverage
+        files: ${{ github.workspace }}\coverage\net8.0.cobertura.xml,${{ github.workspace }}\coverage\net9.0.cobertura.xml,${{ github.workspace }}\coverage\net10.0.cobertura.xml,${{ github.workspace }}\coverage\net11.0.cobertura.xml
+        disable_search: true
+        fail_ci_if_error: true
